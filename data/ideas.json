@@ -1,0 +1,110 @@
+[
+  {
+    "id": "idea-b2e63d0a",
+    "timestamp": "2026-01-06T11:30:26.491262",
+    "text": "Noticed our team was having too many meetings. Calendar was packed but actual work wasn't getting done. Realized synchronous time needs to be protected, not defaulted to. Started experimenting with async-first communication.",
+    "category": "Team Management",
+    "source": "Demo Data",
+    "used": true,
+    "used_date": "2026-01-16T11:30:26.491320"
+  },
+  {
+    "id": "idea-1e32e9e8",
+    "timestamp": "2026-01-07T11:30:26.502906",
+    "text": "Had a conversation with a founder struggling to delegate. They said 'it's faster if I just do it myself.' But that's exactly the problem - short-term speed, long-term bottleneck. Delegation isn't about speed, it's about scale.",
+    "category": "Leadership",
+    "source": "Demo Data",
+    "used": true,
+    "used_date": "2026-01-16T11:30:26.502967"
+  },
+  {
+    "id": "idea-e6115cad",
+    "timestamp": "2026-01-08T11:30:26.540280",
+    "text": "Spent 3 hours debugging an issue that could have been prevented with 10 minutes of documentation. The ROI on good docs is insane, but we always deprioritize it because it's not 'urgent.'",
+    "category": "Operations",
+    "source": "Demo Data",
+    "used": true,
+    "used_date": "2026-01-16T11:30:26.540336"
+  },
+  {
+    "id": "idea-aa3991ea",
+    "timestamp": "2026-01-09T11:30:26.572074",
+    "text": "Watched a junior dev ask a 'stupid' question that revealed a huge gap in our onboarding. Sometimes the best insights come from beginners who don't yet know what they're 'supposed' to know.",
+    "category": "Team Management",
+    "source": "Demo Data",
+    "used": true,
+    "used_date": "2026-01-16T11:30:26.572126"
+  },
+  {
+    "id": "idea-8a157468",
+    "timestamp": "2026-01-10T11:30:26.606858",
+    "text": "Tried ChatGPT for brainstorming and was blown away. Not because it had all the answers, but because it asked questions I hadn't considered. AI as a thinking partner, not a replacement.",
+    "category": "AI & Technology",
+    "source": "Demo Data",
+    "used": true,
+    "used_date": "2026-01-16T11:30:26.606910"
+  },
+  {
+    "id": "idea-40f71664",
+    "timestamp": "2026-01-11T11:30:26.635742",
+    "text": "Read a post about 'shipping fast' vs 'shipping right.' Realized we've been optimizing for speed without considering the cost of technical debt. Sometimes slow is faster.",
+    "category": "Product Development",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-c6e0fbfa",
+    "timestamp": "2026-01-12T11:30:26.662475",
+    "text": "Had to fire someone for the first time. Hardest conversation I've ever had. Learned that delaying hard decisions is just transferring pain to your future self - and being unfair to the person.",
+    "category": "Leadership",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-89700638",
+    "timestamp": "2026-01-13T11:30:26.694547",
+    "text": "Our best hire this year came from an 'unconventional' background. They didn't check the boxes on paper but had the right mindset. Reminded me that hiring for potential beats hiring for experience.",
+    "category": "Team Management",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-e413c769",
+    "timestamp": "2026-01-14T11:30:26.725401",
+    "text": "Realized I was burning out not from working too much, but from context switching too much. 8 hours of fragmented work is exhausting. 4 hours of deep work is energizing.",
+    "category": "Personal Growth",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-c83f3c51",
+    "timestamp": "2026-01-15T11:30:26.752812",
+    "text": "Customer churn analysis revealed our best customers weren't using our fanciest features. They loved the basics done well. Feature bloat is a trap.",
+    "category": "Product Development",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-dc2a5f29",
+    "timestamp": "2026-01-16T11:30:26.782958",
+    "text": "Started writing more and noticed my thinking got clearer. Writing forces you to organize fuzzy thoughts into coherent arguments. It's thinking tool-assisted.",
+    "category": "Personal Growth",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  },
+  {
+    "id": "idea-5c33061f",
+    "timestamp": "2026-01-17T11:30:26.815302",
+    "text": "Implemented a 'no meeting Wednesday' policy. Productivity skyrocketed. The hardest part wasn't the policy - it was defending it when people wanted exceptions.",
+    "category": "Operations",
+    "source": "Demo Data",
+    "used": false,
+    "used_date": null
+  }
+]

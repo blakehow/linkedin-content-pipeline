@@ -138,11 +138,11 @@ def load_sample_data():
 
         storage.create_idea(idea)
 
-    print(f"✅ Sample data loaded successfully!")
-    print(f"   - User settings configured")
+    print("Sample data loaded successfully!")
+    print("   - User settings configured")
     print(f"   - {len([profile1, profile2])} brand profiles created")
     print(f"   - {len(sample_ideas)} sample ideas added")
-    print(f"\nYou can now run: streamlit run app.py")
+    print("\nYou can now run: streamlit run app.py")
 
 
 if __name__ == "__main__":

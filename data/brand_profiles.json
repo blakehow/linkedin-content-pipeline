@@ -1,0 +1,42 @@
+[
+  {
+    "profile_id": "profile-b7602fc4",
+    "profile_name": "Personal Brand",
+    "profile_type": "Personal",
+    "linkedin_username": "alexjohnson",
+    "twitter_username": "@alexj",
+    "target_audience": "Tech professionals, founders, and leaders navigating growth challenges",
+    "tone": "Authentic, vulnerable, insightful - balancing personal stories with tactical advice",
+    "key_topics": [
+      "Leadership",
+      "Team Management",
+      "AI & Technology",
+      "Personal Growth"
+    ],
+    "platform_priority": "LinkedIn primary",
+    "bio": "Helping tech leaders scale their teams and build better systems. Former CTO, current founder. Learning in public about leadership, AI, and sustainable growth.",
+    "avatar_url": null,
+    "is_active": true,
+    "created_at": "2026-01-18T11:30:26.457263"
+  },
+  {
+    "profile_id": "profile-665d300f",
+    "profile_name": "Company Brand",
+    "profile_type": "Company",
+    "linkedin_username": "techcompany",
+    "twitter_username": "@techco",
+    "target_audience": "B2B decision makers, operations leaders, scaling companies",
+    "tone": "Professional, authoritative, data-driven",
+    "key_topics": [
+      "Product Development",
+      "Operations",
+      "Customer Success",
+      "Industry Insights"
+    ],
+    "platform_priority": "Both equal",
+    "bio": "We help companies scale operations and build high-performing teams. Sharing insights on modern work, AI tools, and operational excellence.",
+    "avatar_url": null,
+    "is_active": false,
+    "created_at": "2026-01-18T11:30:26.460033"
+  }
+]
