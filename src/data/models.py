@@ -1,0 +1,250 @@
+"""Data models for the LinkedIn Content Pipeline."""
+
+from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
+
+
+class ProfileType(str, Enum):
+    """Type of brand profile."""
+    PERSONAL = "Personal"
+    COMPANY = "Company"
+    PRODUCT = "Product"
+    OTHER = "Other"
+
+
+class PlatformPriority(str, Enum):
+    """Platform posting priority."""
+    LINKEDIN_PRIMARY = "LinkedIn primary"
+    TWITTER_PRIMARY = "Twitter primary"
+    BOTH_EQUAL = "Both equal"
+
+
+class ContentStatus(str, Enum):
+    """Status of generated content."""
+    DRAFT = "Draft"
+    SCHEDULED = "Scheduled"
+    PUBLISHED = "Published"
+    ARCHIVED = "Archived"
+
+
+class EmojiUsage(str, Enum):
+    """Level of emoji usage in content."""
+    NONE = "None"
+    LIGHT = "Light"
+    MODERATE = "Moderate"
+    HEAVY = "Heavy"
+
+
+# ============================================================================
+# Content Ideas
+# ============================================================================
+
+class Idea(BaseModel):
+    """A content idea from the user."""
+    id: str = Field(..., description="Unique identifier")
+    timestamp: datetime = Field(default_factory=datetime.now)
+    text: str = Field(..., min_length=10, description="The idea content")
+    category: str = Field(default="General", description="Category/tag")
+    source: str = Field(default="Web UI", description="Where idea came from")
+    used: bool = Field(default=False, description="Has been used in content")
+    used_date: Optional[datetime] = None
+
+
+# ============================================================================
+# Brand Profiles
+# ============================================================================
+
+class BrandProfile(BaseModel):
+    """A brand profile for content generation."""
+    profile_id: str = Field(..., description="Unique identifier")
+    profile_name: str = Field(..., min_length=1, max_length=100)
+    profile_type: ProfileType = ProfileType.PERSONAL
+
+    # Social handles
+    linkedin_username: Optional[str] = None
+    twitter_username: Optional[str] = None
+
+    # Content strategy
+    target_audience: str = Field(..., description="Who this content targets")
+    tone: str = Field(..., description="Writing tone/voice")
+    key_topics: List[str] = Field(default_factory=list)
+    platform_priority: PlatformPriority = PlatformPriority.BOTH_EQUAL
+
+    # Brand identity
+    bio: str = Field(..., min_length=10, max_length=500)
+    avatar_url: Optional[HttpUrl] = None
+
+    # Active status
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+# ============================================================================
+# User Settings
+# ============================================================================
+
+class UserSettings(BaseModel):
+    """User configuration settings."""
+
+    # Profile
+    user_full_name: str = Field(..., min_length=1)
+    linkedin_username: Optional[str] = None
+    twitter_username: Optional[str] = None
+    notification_email: Optional[EmailStr] = None
+    default_timezone: str = "UTC"
+
+    # Content Preferences
+    content_tone_default: str = "Professional & Friendly"
+    emoji_usage: EmojiUsage = EmojiUsage.MODERATE
+    include_hashtags: bool = True
+    max_hashtags: int = Field(default=5, ge=0, le=10)
+
+    # Publishing
+    auto_post_enabled: bool = False
+    linkedin_post_frequency: int = Field(default=3, ge=1, le=14, description="Per week")
+    twitter_post_frequency: int = Field(default=5, ge=1, le=21, description="Per week")
+    preferred_post_times: List[str] = Field(default_factory=lambda: ["09:00", "13:00", "17:00"])
+
+    # Notifications
+    enable_email_notifications: bool = False
+    notify_on_post: bool = True
+    notify_on_engagement: bool = False
+
+    # Active profile
+    active_profile_id: Optional[str] = None
+
+
+# ============================================================================
+# Content Generation
+# ============================================================================
+
+class TopicBrief(BaseModel):
+    """A curated topic brief from Stage 1."""
+    topic_id: str
+    core_insight: str = Field(..., description="Main insight from ideas")
+    audience_resonance: str = Field(..., description="Why it resonates")
+    authentic_angle: str = Field(..., description="Personal angle")
+    potential_hook: str = Field(..., description="Suggested opening hook")
+    source_idea_ids: List[str] = Field(..., description="Source idea IDs")
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+class ContentVersion(str, Enum):
+    """Type of content version."""
+    BRIDGE = "Bridge Content"  # Current → Aspirational
+    ASPIRATIONAL = "Aspirational Content"  # High-level, tactical
+    CURRENT = "Current Content"  # Personal, relatable
+
+
+class DevelopedContent(BaseModel):
+    """Developed content from Stage 2."""
+    content_id: str
+    topic_id: str
+    version: ContentVersion
+
+    # Content
+    title: str
+    body: str = Field(..., min_length=100, description="Main content body")
+
+    # Research
+    key_statistics: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+    examples: List[str] = Field(default_factory=list)
+
+    # Metadata
+    word_count: int
+    estimated_read_time: int = Field(..., description="Minutes")
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+class PlatformPost(BaseModel):
+    """Platform-optimized post from Stage 3."""
+    post_id: str
+    content_id: str
+    platform: str = Field(..., description="LinkedIn or Twitter")
+
+    # Post content
+    text: str
+    hashtags: List[str] = Field(default_factory=list)
+
+    # Metadata
+    character_count: int
+    variation_number: int = Field(..., ge=1, le=3, description="1-3 for A/B/C testing")
+    hook_style: str = Field(..., description="Story-Led, Data-Driven, etc.")
+
+    # Platform-specific
+    is_thread: bool = False  # For Twitter threads
+    thread_parts: Optional[List[str]] = None
+
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+class GeneratedContent(BaseModel):
+    """Complete generated content package."""
+    generation_id: str
+    generation_date: datetime = Field(default_factory=datetime.now)
+
+    # Input
+    profile_id: str
+    source_idea_ids: List[str]
+
+    # Pipeline output
+    topic_briefs: List[TopicBrief] = Field(default_factory=list)
+    developed_content: List[DevelopedContent] = Field(default_factory=list)
+    platform_posts: List[PlatformPost] = Field(default_factory=list)
+
+    # Status
+    status: ContentStatus = ContentStatus.DRAFT
+    scheduled_date: Optional[datetime] = None
+    published_date: Optional[datetime] = None
+
+    # Performance (populated after posting)
+    likes: int = 0
+    comments: int = 0
+    shares: int = 0
+    impressions: int = 0
+
+
+# ============================================================================
+# Prompt Templates
+# ============================================================================
+
+class PromptTemplate(BaseModel):
+    """A configurable prompt template."""
+    template_id: str
+    name: str
+    stage: int = Field(..., ge=1, le=3, description="Pipeline stage 1, 2, or 3")
+    template: str = Field(..., min_length=50, description="Prompt template with {variables}")
+    variables: List[str] = Field(default_factory=list, description="Required template variables")
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+# ============================================================================
+# Analytics
+# ============================================================================
+
+class ContentPerformance(BaseModel):
+    """Performance analytics for a piece of content."""
+    post_id: str
+    platform: str
+    published_date: datetime
+
+    # Engagement metrics
+    likes: int = 0
+    comments: int = 0
+    shares: int = 0
+    impressions: int = 0
+    clicks: int = 0
+
+    # Calculated metrics
+    engagement_rate: float = 0.0
+    click_through_rate: float = 0.0
+
+    # Metadata
+    content_version: ContentVersion
+    topic_category: str
+
+    last_updated: datetime = Field(default_factory=datetime.now)
