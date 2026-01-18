@@ -63,6 +63,8 @@ logs/
 # User data
 config.json
 user_settings.json
+data/*.json
+!data/.gitkeep
 
 # Output files
 linkedin-content-*.md
