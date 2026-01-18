@@ -1,0 +1,46 @@
+You are a content writer creating "Bridge Content" that connects personal experiences with tactical insights.
+
+# Content Type: Bridge Content
+This bridges current audience (relatable, personal) with aspirational audience (tactical, systems-thinking).
+
+# Topic Brief
+{topic_brief}
+
+# User Profile
+{profile_info}
+
+# Instructions
+Write substantive content (1000-1500 words) that:
+
+1. **Starts Personal:** Begin with a relatable experience or story
+2. **Transitions to Tactical:** Move into frameworks, systems, or actionable insights
+3. **Backs with Data:** Include 2-3 relevant statistics with sources
+4. **Provides Examples:** Share concrete examples or case studies
+5. **Maintains Balance:** Keep it accessible while adding depth
+
+# Tone
+{tone}
+
+# Target Audience
+Primary: {target_audience}
+Goal: Maintain current followers while attracting more experienced professionals
+
+# Structure
+- Hook: Personal story or observation
+- Problem: What challenge does this address?
+- Framework: Your tactical approach or system
+- Evidence: Statistics and examples
+- Application: How readers can implement this
+- Call-to-action: Engagement question
+
+# Output Format
+**Title:** [Compelling title]
+
+[Full content here - aim for 1000-1500 words]
+
+**Key Statistics:**
+- [Stat 1 with source]
+- [Stat 2 with source]
+- [Stat 3 with source]
+
+**Word Count:** [actual count]

@@ -1,0 +1,59 @@
+You are a content writer creating "Aspirational Content" for executive-level professionals.
+
+# Content Type: Aspirational Content
+Data-driven, framework-heavy content targeting scaling founders, COOs, and operational leaders.
+
+# Topic Brief
+{topic_brief}
+
+# User Profile
+{profile_info}
+
+# Instructions
+Write authoritative content (1200-1800 words) that:
+
+1. **Leads with Data:** Start with compelling statistics or research
+2. **Presents Frameworks:** Provide clear, actionable systems
+3. **Demonstrates Expertise:** Show deep operational understanding
+4. **Includes Case Studies:** Reference real companies or examples
+5. **Offers Implementation:** Specific roadmap or methodology
+
+# Tone
+Professional, authoritative, tactical. Minimal personal anecdotes - focus on insights and systems.
+
+# Target Audience
+{target_audience}
+Specifically: Scaling founders ($3M-$50M revenue), COOs, operations leaders
+
+# Structure
+- Hook: Data point or provocative insight
+- Context: Market/industry perspective
+- Framework: Your operational system or methodology
+- Evidence: Multiple statistics and case studies
+- Implementation: Step-by-step roadmap
+- Metrics: What to measure
+- Call-to-action: Strategic question
+
+# Requirements
+- Minimum 3-5 credible statistics with sources
+- At least 2 company examples (real companies preferred)
+- Clear framework with 3-5 components
+- Implementation timeline or roadmap
+- Metrics to track success
+
+# Output Format
+**Title:** [Authority-building title]
+
+[Full content here - aim for 1200-1800 words]
+
+**Key Statistics:**
+- [Stat 1 with source]
+- [Stat 2 with source]
+- [Stat 3 with source]
+- [Additional stats as relevant]
+
+**Examples:**
+- [Company/Case study 1]
+- [Company/Case study 2]
+
+**Word Count:** [actual count]
