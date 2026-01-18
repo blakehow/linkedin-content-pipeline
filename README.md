@@ -20,42 +20,51 @@ A flexible, multi-platform content generation system with web UI for creating an
 - Ollama AI: FREE
 - Twitter API (optional): $100/month
 
-## Quick Start
+## Quick Start (2 Minutes)
 
-### Prerequisites
-
-- Python 3.9+
-- 8GB RAM (for local AI models)
-- Google account
-- Ollama installed
-
-### Installation
+Demo mode requires no API keys or setup:
 
 ```bash
-# Clone repository
+# 1. Clone and install
 git clone https://github.com/blakehow/linkedin-content-pipeline.git
 cd linkedin-content-pipeline
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Install Ollama
-# Visit: https://ollama.ai/download
+# 2. Create .env file
+cp .env.example .env
 
-# Pull AI model
-ollama pull llama3.1:8b
+# 3. Load sample data
+python load_sample_data.py
 
-# Run app
+# 4. Run app
 streamlit run app.py
 ```
 
-### First-Time Setup
+The app opens at `http://localhost:8501` with sample data ready to explore.
 
-The app will guide you through:
-1. Connecting Google Sheets
-2. Setting up your profile
-3. Adding social media accounts
-4. Creating your first brand profile
+## Full Setup
+
+For production use with real AI:
+
+**Option A: Ollama (Local, Free)**
+```bash
+# Install Ollama from ollama.ai
+ollama pull llama3.1:8b
+ollama serve
+
+# Update .env
+AI_SERVICE_PRIMARY=ollama
+```
+
+**Option B: Google Gemini (Cloud, Free Tier)**
+```bash
+# Get API key from makersuite.google.com
+# Update .env
+AI_SERVICE_PRIMARY=gemini
+GOOGLE_GEMINI_API_KEY=your-key
+```
+
+See [SETUP.md](SETUP.md) for detailed instructions.
 
 ## Documentation
 
@@ -67,7 +76,23 @@ The app will guide you through:
 
 ## Project Status
 
-🚧 **In Development** - Design phase complete, implementation in progress
+✅ **Fully Functional** - All core features implemented and ready to use
+
+**Completed:**
+- ✅ Complete 3-stage content pipeline
+- ✅ Streamlit web UI with 6 pages
+- ✅ Mock AI + Ollama + Gemini support with fallback
+- ✅ Configurable prompt templates
+- ✅ Mock storage (JSON files)
+- ✅ Demo mode with sample data
+- ✅ User settings and brand profiles
+
+**Roadmap:**
+- 🔄 Google Sheets integration
+- 🔄 LinkedIn/Twitter API integration for auto-posting
+- 🔄 Analytics and performance tracking
+- 🔄 Test suite
+- 🔄 Docker deployment
 
 ## Contributing
 
