@@ -1,0 +1,46 @@
+# Core Framework
+streamlit>=1.31.0
+
+# Data Validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# AI/LLM Integration
+ollama>=0.1.6
+google-generativeai>=0.3.2
+
+# Data & Utilities
+pandas>=2.1.0
+python-dotenv>=1.0.0
+
+# Date/Time
+python-dateutil>=2.8.2
+
+# HTTP Requests (for web research)
+requests>=2.31.0
+httpx>=0.26.0
+
+# Google Sheets (future integration)
+gspread>=5.12.0
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# Social Media APIs (future integration)
+tweepy>=4.14.0
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+pytest-asyncio>=0.21.1
+
+# Code Quality
+flake8>=7.0.0
+black>=24.1.0
+mypy>=1.8.0
+isort>=5.13.0
+
+# Security
+bandit>=1.7.6
+safety>=3.0.0

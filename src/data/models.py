@@ -45,7 +45,9 @@ class Idea(BaseModel):
     """A content idea from the user."""
     id: str = Field(..., description="Unique identifier")
     timestamp: datetime = Field(default_factory=datetime.now)
+    title: Optional[str] = Field(default=None, description="Quick identifier for the idea")
     text: str = Field(..., min_length=10, description="The idea content")
+    refined_text: Optional[str] = Field(default=None, description="LLM-enhanced version of the idea")
     category: str = Field(default="General", description="Category/tag")
     source: str = Field(default="Web UI", description="Where idea came from")
     used: bool = Field(default=False, description="Has been used in content")
@@ -115,6 +117,21 @@ class UserSettings(BaseModel):
     # Active profile
     active_profile_id: Optional[str] = None
 
+    # Idea Categories
+    idea_categories: List[str] = Field(
+        default_factory=lambda: [
+            "General", "Leadership", "Team Management",
+            "Product Development", "Personal Growth",
+            "AI & Technology", "Marketing", "Operations",
+            "Customer Success", "Other"
+        ],
+        description="User-customizable categories for organizing ideas"
+    )
+
+    # AI Provider Configuration
+    ai_provider_primary: str = Field(default="gemini", description="Primary AI service: gemini, ollama, or mock")
+    ai_provider_fallback: str = Field(default="ollama", description="Fallback AI service if primary fails")
+
 
 # ============================================================================
 # Content Generation
@@ -177,6 +194,10 @@ class PlatformPost(BaseModel):
     # Platform-specific
     is_thread: bool = False  # For Twitter threads
     thread_parts: Optional[List[str]] = None
+
+    # Publishing tracking
+    linkedin_url: Optional[str] = Field(default=None, description="URL of published LinkedIn post")
+    published_at: Optional[datetime] = Field(default=None, description="When post was published")
 
     created_at: datetime = Field(default_factory=datetime.now)
 

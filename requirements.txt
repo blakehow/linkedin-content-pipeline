@@ -1,46 +1,56 @@
+# LinkedIn Content Pipeline - Pinned Dependencies
+# Generated: 2026-01-25
+# Python 3.9+
+
 # Core Framework
-streamlit>=1.31.0
+streamlit==1.53.1
 
 # Data Validation
-pydantic>=2.5.0
-pydantic-settings>=2.1.0
+pydantic==2.12.5
+pydantic-settings==2.12.0
 
 # AI/LLM Integration
-ollama>=0.1.6
-google-generativeai>=0.3.2
+ollama==0.6.1
+google-generativeai==0.8.6
 
 # Data & Utilities
-pandas>=2.1.0
-python-dotenv>=1.0.0
+pandas==2.3.3
+python-dotenv==1.2.1
 
 # Date/Time
-python-dateutil>=2.8.2
+python-dateutil==2.9.0.post0
 
-# HTTP Requests (for web research)
-requests>=2.31.0
-httpx>=0.26.0
+# HTTP Requests
+requests==2.32.5
+httpx==0.28.1
 
-# Google Sheets (future integration)
-gspread>=5.12.0
-google-auth>=2.25.0
-google-auth-oauthlib>=1.2.0
-google-auth-httplib2>=0.2.0
+# Google Sheets Integration
+gspread==6.2.1
+google-auth==2.41.1
+google-auth-oauthlib==1.2.1
+google-auth-httplib2==0.3.0
 
-# Social Media APIs (future integration)
-tweepy>=4.14.0
+# Social Media APIs
+tweepy==4.16.0
 
 # Testing
-pytest>=7.4.3
-pytest-cov>=4.1.0
-pytest-mock>=3.12.0
-pytest-asyncio>=0.21.1
+pytest==9.0.2
+pytest-cov==4.1.0
+pytest-mock==3.14.0
+pytest-asyncio==0.25.4
 
 # Code Quality
-flake8>=7.0.0
-black>=24.1.0
-mypy>=1.8.0
-isort>=5.13.0
+flake8==7.3.0
+black==25.12.0
+mypy==1.19.1
+isort==7.0.0
 
 # Security
-bandit>=1.7.6
-safety>=3.0.0
+bandit==1.9.3
+safety==3.7.0
+
+# Security Note:
+# - ecdsa==0.19.1 has CVE-2024-23342 (timing attack, low severity)
+# - This is a transitive dependency from google-auth
+# - Not directly used in the application
+# - Risk accepted as low impact for this use case

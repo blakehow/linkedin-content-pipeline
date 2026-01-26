@@ -70,12 +70,12 @@ def show():
     with col3:
         st.markdown("""
         ### Stage 3: Platform Optimization
-        🎨 **Optimize for platforms**
+        🎨 **Optimize for LinkedIn**
 
-        Content is adapted for LinkedIn and Twitter with proper formatting, hooks, hashtags, and engagement tactics.
+        Content is adapted for LinkedIn with proper formatting, hooks, hashtags, and engagement tactics.
 
         ➡️ Input: Developed content
-        ➡️ Output: Ready-to-post content
+        ➡️ Output: Ready-to-post LinkedIn content
         """)
 
     st.markdown("---")
@@ -95,8 +95,7 @@ def show():
         4. Run the **Pipeline** to generate content
         """)
 
-        if st.button("Go to Settings →", type="primary"):
-            st.switch_page("pages/settings.py")
+        st.info("👈 Use the sidebar to navigate to **⚙️ Settings**")
 
     else:
         ideas = storage.get_ideas(unused_only=True)
@@ -104,8 +103,7 @@ def show():
         if len(ideas) < 5:
             st.info(f"💡 **Add More Ideas**\n\nYou have {len(ideas)} unused ideas. Add at least 5 for best results.")
 
-            if st.button("Add Ideas →", type="primary"):
-                st.switch_page("pages/idea_entry.py")
+            st.info("👈 Use the sidebar to navigate to **💡 Add Ideas**")
 
         else:
             st.success("✅ **Ready to Generate Content!**")
@@ -119,8 +117,7 @@ def show():
             You're ready to run the pipeline!
             """)
 
-            if st.button("Run Pipeline →", type="primary"):
-                st.switch_page("pages/pipeline_runner.py")
+            st.info("👈 Use the sidebar to navigate to **🚀 Run Pipeline**")
 
     st.markdown("---")
 

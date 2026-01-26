@@ -233,6 +233,28 @@ class MockStorage:
         self._save_json(self.content_file, content_data)
         return content
 
+    def delete_content(self, generation_id: str) -> bool:
+        """Delete content by generation ID."""
+        content_data = self._load_json(self.content_file)
+        original_length = len(content_data)
+        content_data = [c for c in content_data if c['generation_id'] != generation_id]
+
+        if len(content_data) < original_length:
+            self._save_json(self.content_file, content_data)
+            return True
+        return False
+
+    def delete_idea(self, idea_id: str) -> bool:
+        """Delete an idea by ID."""
+        ideas_data = self._load_json(self.ideas_file)
+        original_length = len(ideas_data)
+        ideas_data = [i for i in ideas_data if i['id'] != idea_id]
+
+        if len(ideas_data) < original_length:
+            self._save_json(self.ideas_file, ideas_data)
+            return True
+        return False
+
     # ========================================================================
     # Prompt Templates
     # ========================================================================

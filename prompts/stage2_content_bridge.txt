@@ -10,7 +10,7 @@ This bridges current audience (relatable, personal) with aspirational audience (
 {profile_info}
 
 # Instructions
-Write substantive content (1000-1500 words) that:
+Write substantive content ({word_count_guidance}) that:
 
 1. **Starts Personal:** Begin with a relatable experience or story
 2. **Transitions to Tactical:** Move into frameworks, systems, or actionable insights

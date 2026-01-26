@@ -33,20 +33,26 @@ class PipelineOrchestrator:
     def run_full_pipeline(
         self,
         profile_id: str,
+        idea_ids: Optional[List[str]] = None,
+        existing_topics: Optional[List[TopicBrief]] = None,
         num_ideas: int = 10,
         num_topics: int = 5,
         content_versions: Optional[List[str]] = None,
         platforms: Optional[List[str]] = None,
+        target_word_count: int = 1000,
         progress_callback: Optional[callable] = None
     ) -> GeneratedContent:
         """Run the complete 3-stage pipeline.
 
         Args:
             profile_id: Brand profile ID to use
-            num_ideas: Number of unused ideas to pull
+            idea_ids: Optional list of specific idea IDs to use
+            existing_topics: Optional list of existing topics to regenerate content from
+            num_ideas: Number of unused ideas to pull (used if idea_ids not provided)
             num_topics: Number of topics to curate (default 5)
             content_versions: Which versions to generate (bridge, aspirational, current)
             platforms: Which platforms to optimize for (linkedin, twitter)
+            target_word_count: Target word count for developed content
             progress_callback: Optional callback for progress updates
 
         Returns:
@@ -64,37 +70,82 @@ class PipelineOrchestrator:
         if not settings:
             raise ValueError("User settings not configured")
 
-        # Get unused ideas
-        self._update_progress(progress_callback, "Loading ideas...", 5)
-        ideas = self.storage.get_ideas(unused_only=True, limit=num_ideas)
+        # Get ideas: use specific IDs if provided, otherwise get unused ideas
+        # Skip if using existing topics
+        if existing_topics:
+            ideas = []  # No ideas needed when using existing topics
+            logger.info("Skipping idea loading - using existing topics")
+        elif idea_ids:
+            # Get specific ideas by ID
+            ideas = []
+            for idea_id in idea_ids:
+                idea = self.storage.get_idea(idea_id)
+                if idea:
+                    ideas.append(idea)
+                else:
+                    logger.warning(f"Idea not found: {idea_id}")
 
-        if not ideas:
-            raise ValueError("No unused ideas available. Please add some ideas first.")
+            if not ideas:
+                raise ValueError("None of the specified idea IDs were found.")
 
-        logger.info(f"Using {len(ideas)} ideas")
+            logger.info(f"Using {len(ideas)} selected ideas")
+        else:
+            # Fallback to getting unused ideas sequentially
+            ideas = self.storage.get_ideas(unused_only=True, limit=num_ideas)
+
+            if not ideas:
+                raise ValueError("No unused ideas available. Please add some ideas first.")
+
+            logger.info(f"Using {len(ideas)} unused ideas")
 
         # Initialize result object
         generation_id = f"gen-{uuid.uuid4().hex[:8]}"
-        result = GeneratedContent(
-            generation_id=generation_id,
-            generation_date=datetime.now(),
-            profile_id=profile_id,
-            source_idea_ids=[idea.id for idea in ideas],
-            status=ContentStatus.DRAFT
-        )
 
-        # === STAGE 1: Topic Curation ===
-        self._update_progress(progress_callback, "Stage 1: Curating topics...", 15)
-        logger.info("--- Stage 1: Topic Curation ---")
+        # === STAGE 1: Topic Curation (or use existing topics) ===
+        if existing_topics:
+            # Skip stage 1 - use provided topics
+            self._update_progress(progress_callback, "Using existing topics...", 15)
+            logger.info("--- Using Existing Topics (Skipping Stage 1) ---")
 
-        topic_briefs = self.stage1.curate_topics(
-            ideas=ideas,
-            profile=profile,
-            num_topics=num_topics
-        )
+            topic_briefs = existing_topics
+            source_idea_ids = []  # No new ideas used
+
+            # Extract source idea IDs from topics if available
+            for topic in existing_topics:
+                if hasattr(topic, 'source_idea_ids') and topic.source_idea_ids:
+                    source_idea_ids.extend(topic.source_idea_ids)
+
+            result = GeneratedContent(
+                generation_id=generation_id,
+                generation_date=datetime.now(),
+                profile_id=profile_id,
+                source_idea_ids=source_idea_ids,
+                status=ContentStatus.DRAFT
+            )
+
+            logger.info(f"Using {len(topic_briefs)} existing topics")
+        else:
+            # Normal flow - curate topics from ideas
+            result = GeneratedContent(
+                generation_id=generation_id,
+                generation_date=datetime.now(),
+                profile_id=profile_id,
+                source_idea_ids=[idea.id for idea in ideas],
+                status=ContentStatus.DRAFT
+            )
+
+            self._update_progress(progress_callback, "Stage 1: Curating topics...", 15)
+            logger.info("--- Stage 1: Topic Curation ---")
+
+            topic_briefs = self.stage1.curate_topics(
+                ideas=ideas,
+                profile=profile,
+                num_topics=num_topics
+            )
+
+            logger.info(f"Curated {len(topic_briefs)} topics")
 
         result.topic_briefs = topic_briefs
-        logger.info(f"Curated {len(topic_briefs)} topics")
 
         # === STAGE 2: Content Development ===
         self._update_progress(progress_callback, "Stage 2: Developing content...", 35)
@@ -115,7 +166,8 @@ class PipelineOrchestrator:
             contents = self.stage2.develop_content(
                 topic_brief=topic,
                 profile=profile,
-                versions=content_versions
+                versions=content_versions,
+                target_word_count=target_word_count
             )
 
             # Update topic_id reference
@@ -165,8 +217,10 @@ class PipelineOrchestrator:
         self._update_progress(progress_callback, "Saving results...", 95)
         self.storage.create_content(result)
 
-        # Mark ideas as used
-        self.storage.mark_ideas_as_used([idea.id for idea in ideas])
+        # Mark ideas as used (only if we used new ideas, not existing topics)
+        if not existing_topics and ideas:
+            self.storage.mark_ideas_as_used([idea.id for idea in ideas])
+            logger.info(f"Marked {len(ideas)} ideas as used")
 
         self._update_progress(progress_callback, "Pipeline complete!", 100)
         logger.info(f"=== Pipeline Complete: {generation_id} ===")

@@ -11,6 +11,10 @@ class MockAIClient(AIClient):
         """Generate mock response based on prompt keywords."""
         prompt_lower = prompt.lower()
 
+        # Idea Refinement (NEW - check this first!)
+        if "refine" in prompt_lower and "original idea:" in prompt_lower:
+            return self._mock_refine_idea(prompt)
+
         # Stage 1: Topic Curation
         if "curate" in prompt_lower or "topic" in prompt_lower:
             return self._mock_topic_curation()
@@ -37,6 +41,48 @@ class MockAIClient(AIClient):
     def is_available(self) -> bool:
         """Mock client is always available."""
         return True
+
+    def _mock_refine_idea(self, prompt: str) -> str:
+        """Mock refinement that uses the actual user input."""
+        # Extract the original idea from the prompt
+        try:
+            start_marker = "Original idea:"
+            end_marker = "Please:"
+
+            start_idx = prompt.find(start_marker)
+            end_idx = prompt.find(end_marker)
+
+            if start_idx != -1 and end_idx != -1:
+                original_idea = prompt[start_idx + len(start_marker):end_idx].strip()
+            else:
+                return "Unable to refine: Could not parse your input."
+
+            # Simple mock refinement: add structure and professional language
+            lines = original_idea.split('\n')
+            refined_parts = []
+
+            # Add an engaging opening if the idea is short
+            if len(original_idea) < 200:
+                refined_parts.append(f"Here's an interesting perspective on this:\n")
+
+            # Add the original content with slight enhancements
+            for line in lines:
+                if line.strip():
+                    # Capitalize first letter if needed
+                    refined_line = line.strip()
+                    if refined_line and refined_line[0].islower():
+                        refined_line = refined_line[0].upper() + refined_line[1:]
+                    refined_parts.append(refined_line)
+
+            # Add a call-to-action or closing thought
+            if len(original_idea) > 50:
+                refined_parts.append("\nThis could be valuable for professionals looking to improve their approach.")
+
+            return "\n\n".join(refined_parts)
+
+        except Exception:
+            # Fallback if parsing fails
+            return f"[Mock AI] Your idea has been refined with better structure, clarity, and professional tone. (Note: This is a mock AI client for demo purposes. Configure a real AI service in settings for actual refinement.)"
 
     def _mock_topic_curation(self) -> str:
         """Mock topic curation output."""

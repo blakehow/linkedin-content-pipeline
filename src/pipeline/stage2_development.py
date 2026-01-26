@@ -25,7 +25,8 @@ class ContentDeveloper:
         self,
         topic_brief: TopicBrief,
         profile: BrandProfile,
-        versions: List[str] = None
+        versions: List[str] = None,
+        target_word_count: int = 1000
     ) -> List[DevelopedContent]:
         """Develop a topic brief into content versions.
 
@@ -34,6 +35,7 @@ class ContentDeveloper:
             profile: Brand profile for context
             versions: List of version types (bridge, aspirational, current)
                      Default: all three
+            target_word_count: Target word count for articles (default 1000)
 
         Returns:
             List of DevelopedContent objects
@@ -41,7 +43,7 @@ class ContentDeveloper:
         if versions is None:
             versions = ["bridge", "aspirational", "current"]
 
-        logger.info(f"Developing topic {topic_brief.topic_id} into {len(versions)} versions")
+        logger.info(f"Developing topic {topic_brief.topic_id} into {len(versions)} versions (target: {target_word_count} words)")
 
         # Prepare profile info
         profile_info = {
@@ -61,7 +63,8 @@ class ContentDeveloper:
                 content = self._generate_version(
                     topic_text,
                     version_type,
-                    profile_info
+                    profile_info,
+                    target_word_count
                 )
                 developed.append(content)
             except Exception as e:
@@ -86,7 +89,8 @@ class ContentDeveloper:
         self,
         topic_text: str,
         version_type: str,
-        profile_info: Dict
+        profile_info: Dict,
+        target_word_count: int = 1000
     ) -> DevelopedContent:
         """Generate a single content version."""
 
@@ -98,11 +102,15 @@ class ContentDeveloper:
         }
         version_enum = version_map.get(version_type.lower(), ContentVersion.BRIDGE)
 
+        # Add word count guidance to profile info
+        profile_info_with_length = profile_info.copy()
+        profile_info_with_length["target_word_count"] = target_word_count
+
         # Render prompt
         prompt = self.prompt_manager.render_stage2(
             topic_text,
             version_type,
-            profile_info
+            profile_info_with_length
         )
 
         # Generate content

@@ -65,11 +65,16 @@ class PromptManager:
         template_name = template_map.get(content_type.lower(), "stage2_content_bridge")
         template = cls.load_template(template_name)
 
+        # Get word count guidance
+        word_count = profile_info.get("target_word_count", 1000)
+        word_count_guidance = f"Target length: approximately {word_count} words"
+
         variables = {
             "topic_brief": topic_brief,
             "profile_info": profile_info.get("bio", ""),
             "target_audience": profile_info.get("target_audience", "professionals"),
             "tone": profile_info.get("tone", "professional and friendly"),
+            "word_count_guidance": word_count_guidance,
         }
 
         return cls.render(template, variables)

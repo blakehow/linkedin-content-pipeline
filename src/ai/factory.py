@@ -7,6 +7,7 @@ from src.ai.base import AIClient
 from src.ai.mock_client import MockAIClient
 from src.ai.ollama_client import OllamaClient
 from src.ai.gemini_client import GeminiClient
+from src.security import validate_ai_output
 from config.settings import get_settings
 
 logger = logging.getLogger(__name__)
@@ -18,41 +19,78 @@ class AIClientWithFallback:
     def __init__(
         self,
         primary_client: AIClient,
-        fallback_client: Optional[AIClient] = None
+        fallback_client: Optional[AIClient] = None,
+        primary_name: str = "Primary",
+        fallback_name: str = "Fallback"
     ):
         """Initialize with primary and optional fallback client."""
         self.primary_client = primary_client
         self.fallback_client = fallback_client
+        self.primary_name = primary_name
+        self.fallback_name = fallback_name
         self._primary_failed = False
+        self._last_error_message = None
 
     def generate(self, prompt: str, max_tokens: Optional[int] = None) -> str:
         """Generate text, falling back if primary fails."""
+
+        response = None
+        primary_error = None
+        fallback_error = None
 
         # Try primary first
         if not self._primary_failed:
             try:
                 if self.primary_client.is_available():
-                    logger.info("Using primary AI client")
-                    return self.primary_client.generate(prompt, max_tokens)
+                    logger.info(f"Using {self.primary_name} AI client")
+                    response = self.primary_client.generate(prompt, max_tokens)
                 else:
-                    logger.warning("Primary AI client not available")
+                    logger.warning(f"{self.primary_name} AI client not available")
                     self._primary_failed = True
+                    primary_error = f"{self.primary_name} service is not available"
             except Exception as e:
-                logger.error(f"Primary AI client failed: {e}")
+                error_str = str(e).lower()
+                logger.error(f"{self.primary_name} AI client failed: {e}")
                 self._primary_failed = True
+                primary_error = str(e)
+
+                # Check if it's a quota/rate limit error
+                if any(x in error_str for x in ["quota", "rate limit", "429"]):
+                    primary_error = f"{self.primary_name} quota exceeded. Trying {self.fallback_name}..."
 
         # Fall back to secondary
-        if self.fallback_client:
+        if response is None and self.fallback_client:
             try:
                 if self.fallback_client.is_available():
-                    logger.info("Using fallback AI client")
-                    return self.fallback_client.generate(prompt, max_tokens)
+                    logger.info(f"Using {self.fallback_name} AI client")
+                    response = self.fallback_client.generate(prompt, max_tokens)
                 else:
-                    logger.error("Fallback AI client not available")
+                    fallback_error = f"{self.fallback_name} service is not available"
+                    logger.error(fallback_error)
             except Exception as e:
-                logger.error(f"Fallback AI client failed: {e}")
+                fallback_error = str(e)
+                logger.error(f"{self.fallback_name} AI client failed: {e}")
 
-        raise RuntimeError("All AI services failed")
+        if response is None:
+            # Build helpful error message
+            error_parts = []
+            if primary_error:
+                error_parts.append(f"{self.primary_name} failed: {primary_error}")
+            if fallback_error:
+                error_parts.append(f"{self.fallback_name} failed: {fallback_error}")
+            elif not self.fallback_client:
+                error_parts.append("No fallback service configured")
+
+            full_error = ". ".join(error_parts)
+            self._last_error_message = full_error
+            raise RuntimeError(full_error)
+
+        # Validate AI output for security
+        return validate_ai_output(response)
+
+    def get_last_error(self) -> Optional[str]:
+        """Get the last error message."""
+        return self._last_error_message
 
     def is_available(self) -> bool:
         """Check if any client is available."""
@@ -64,23 +102,38 @@ class AIClientWithFallback:
 
 def create_ai_client() -> AIClientWithFallback:
     """Create AI client based on configuration."""
+    from src.data.storage import get_storage
+
     settings = get_settings()
+    storage = get_storage()
+    user_settings = storage.get_settings()
+
+    # Use user settings if available, otherwise fall back to env settings
+    if user_settings and hasattr(user_settings, 'ai_provider_primary'):
+        primary_service = user_settings.ai_provider_primary
+        fallback_service = user_settings.ai_provider_fallback if hasattr(user_settings, 'ai_provider_fallback') else None
+    else:
+        primary_service = settings.ai_service_primary
+        fallback_service = settings.ai_service_fallback
 
     # Create primary client
-    primary_client = _create_client(
-        settings.ai_service_primary,
-        settings
-    )
+    primary_client = _create_client(primary_service, settings)
 
     # Create fallback client if different from primary
     fallback_client = None
-    if settings.ai_service_fallback and settings.ai_service_fallback != settings.ai_service_primary:
-        fallback_client = _create_client(
-            settings.ai_service_fallback,
-            settings
-        )
+    fallback_name = None
+    if (fallback_service and
+        fallback_service != primary_service and
+        fallback_service.lower() not in ["none", "null", ""]):
+        fallback_client = _create_client(fallback_service, settings)
+        fallback_name = fallback_service.capitalize()
 
-    return AIClientWithFallback(primary_client, fallback_client)
+    return AIClientWithFallback(
+        primary_client,
+        fallback_client,
+        primary_name=primary_service.capitalize(),
+        fallback_name=fallback_name or "None"
+    )
 
 
 def _create_client(service_type: str, settings) -> AIClient:

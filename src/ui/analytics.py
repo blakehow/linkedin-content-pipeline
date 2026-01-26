@@ -69,7 +69,7 @@ def show():
     - Content type analysis
     - Platform comparison
 
-    Connect your LinkedIn and Twitter accounts to track performance automatically.
+    Connect your LinkedIn account to track performance automatically.
     """)
 
     # Recent activity
