@@ -227,6 +227,15 @@ class GeneratedContent(BaseModel):
     shares: int = 0
     impressions: int = 0
 
+    # Runtime tracking
+    pipeline_start_time: Optional[datetime] = None
+    pipeline_end_time: Optional[datetime] = None
+    pipeline_duration_seconds: Optional[float] = None
+    stage1_duration_seconds: Optional[float] = None
+    stage2_duration_seconds: Optional[float] = None
+    stage3_duration_seconds: Optional[float] = None
+    ai_provider_used: Optional[str] = None
+
 
 # ============================================================================
 # Prompt Templates
