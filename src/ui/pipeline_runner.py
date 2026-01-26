@@ -377,12 +377,13 @@ def show():
                     developed_content.append(content)
 
                     # Display this content piece immediately
-                    version_names = {
-                        "Bridge Content": "Bridge",
-                        "Aspirational Content": "Aspirational",
-                        "Current Content": "Current"
+                    # Map from enum value to custom name from settings
+                    version_map = {
+                        "Bridge Content": settings.content_version_names[0] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 0 else "Bridge",
+                        "Aspirational Content": settings.content_version_names[1] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 1 else "Aspirational",
+                        "Current Content": settings.content_version_names[2] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 2 else "Current"
                     }
-                    version_name = version_names.get(content.version.value, content.version.value)
+                    version_name = version_map.get(content.version.value, content.version.value)
 
                     # Find which topic this belongs to
                     topic_idx = next((i for i, t in enumerate(topic_briefs) if t.topic_id == content.topic_id), 0)

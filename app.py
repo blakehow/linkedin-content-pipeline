@@ -18,81 +18,53 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS - Dark Professional Theme
+# Custom CSS - Professional Theme with High Contrast
 st.markdown("""
     <style>
-    /* Dark theme colors */
-    :root {
-        --background-primary: #1a1a1a;
-        --background-secondary: #2d2d2d;
-        --text-primary: #e0e0e0;
-        --text-secondary: #b0b0b0;
-        --accent-color: #0077B5;
-        --border-color: #404040;
-    }
-
     /* Main content area */
     .stApp {
-        background-color: #1a1a1a;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
 
-    /* Reduce header sizes */
+    /* Headers - clear and readable */
     h1 {
         font-size: 1.8rem !important;
         font-weight: 600 !important;
-        color: #e0e0e0 !important;
         margin-bottom: 1rem !important;
     }
 
     h2 {
-        font-size: 1.3rem !important;
+        font-size: 1.4rem !important;
         font-weight: 500 !important;
-        color: #d0d0d0 !important;
     }
 
     h3 {
-        font-size: 1.1rem !important;
+        font-size: 1.15rem !important;
         font-weight: 500 !important;
-        color: #c0c0c0 !important;
     }
 
-    /* Sidebar styling */
-    [data-testid="stSidebar"] {
-        background-color: #2d2d2d;
+    /* Ensure all text is readable */
+    p, span, div, label {
+        color: inherit !important;
     }
 
-    /* Text areas and inputs */
-    .stTextArea textarea, .stTextInput input {
-        font-size: 0.85rem !important;
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #404040 !important;
+    /* Text areas and inputs - high contrast */
+    .stTextArea textarea, .stTextInput input, .stSelectbox select {
+        font-size: 0.95rem !important;
+        padding: 0.5rem !important;
     }
 
     /* Buttons */
     .stButton button {
-        font-size: 0.85rem !important;
+        font-size: 0.9rem !important;
         font-weight: 500 !important;
         border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
     }
 
     /* Expander */
     .streamlit-expanderHeader {
-        font-size: 0.9rem !important;
-        background-color: #2d2d2d !important;
-    }
-
-    /* Cards and containers */
-    [data-testid="stExpander"] {
-        background-color: #2d2d2d;
-        border: 1px solid #404040;
-    }
-
-    /* Markdown text */
-    .stMarkdown {
-        font-size: 0.85rem;
-        color: #e0e0e0;
+        font-size: 0.95rem !important;
     }
 
     /* Reduce spacing */
@@ -101,13 +73,19 @@ st.markdown("""
         padding-bottom: 1rem !important;
     }
 
-    /* Professional metric cards */
-    .metric-card {
-        background: #2d2d2d;
-        padding: 0.75rem;
-        border-radius: 4px;
-        margin: 0.5rem 0;
-        border: 1px solid #404040;
+    /* Info/Warning/Error boxes - ensure visibility */
+    .stAlert {
+        padding: 1rem !important;
+    }
+
+    /* Metric values */
+    [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;
+    }
+
+    /* Captions */
+    .stCaptionContainer {
+        font-size: 0.85rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
