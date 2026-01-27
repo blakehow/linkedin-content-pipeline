@@ -357,7 +357,8 @@ def show():
             pipeline_generator = orchestrator.run_pipeline_progressive(**pipeline_params)
 
             topic_briefs = []
-            developed_content = []
+            # Store content by topic and version for side-by-side display
+            content_by_topic = {}  # {topic_id: {version_name: content}}
             final_result = None
 
             # Process results as they're yielded
@@ -372,11 +373,13 @@ def show():
                                 st.markdown(f"**Audience Resonance:** {topic.audience_resonance}")
                                 st.markdown(f"**Authentic Angle:** {topic.authentic_angle}")
 
+                    # Initialize content storage for each topic
+                    for topic in topic_briefs:
+                        content_by_topic[topic.topic_id] = {}
+
                 elif stage_type == "content":
                     content = data
-                    developed_content.append(content)
 
-                    # Display this content piece immediately
                     # Map from enum value to custom name from settings
                     version_map = {
                         "Bridge Content": settings.content_version_names[0] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 0 else "Bridge",
@@ -385,25 +388,52 @@ def show():
                     }
                     version_name = version_map.get(content.version.value, content.version.value)
 
-                    # Find which topic this belongs to
+                    # Store content by topic and version
+                    if content.topic_id not in content_by_topic:
+                        content_by_topic[content.topic_id] = {}
+                    content_by_topic[content.topic_id][version_name] = content
+
+                    # Re-render all content for this topic in side-by-side columns
                     topic_idx = next((i for i, t in enumerate(topic_briefs) if t.topic_id == content.topic_id), 0)
+                    topic = topic_briefs[topic_idx]
 
                     with content_display_area:
-                        with st.container(border=True):
-                            st.markdown(f"### {version_name}")
-                            st.caption(f"Topic {topic_idx + 1} | {content.word_count} words | {content.estimated_read_time} min read")
-                            if hasattr(content, '_generation_time'):
-                                st.caption(f"Generated in {content._generation_time:.1f}s")
+                        st.markdown(f"### Topic {topic_idx + 1}: {topic.core_insight[:80]}...")
 
-                            st.markdown(f"**{content.title}**")
-                            st.markdown("---")
-                            st.text_area(
-                                "Content",
-                                content.body,
-                                height=300,
-                                key=f"content-prog-{content.content_id}",
-                                label_visibility="collapsed"
-                            )
+                        # Create 3 columns for side-by-side comparison
+                        col1, col2, col3 = st.columns(3)
+
+                        # Get custom version names
+                        version_names = [
+                            settings.content_version_names[0] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 0 else "Bridge",
+                            settings.content_version_names[1] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 1 else "Aspirational",
+                            settings.content_version_names[2] if hasattr(settings, 'content_version_names') and len(settings.content_version_names) > 2 else "Current"
+                        ]
+
+                        cols = [col1, col2, col3]
+
+                        for idx, (col, vname) in enumerate(zip(cols, version_names)):
+                            with col:
+                                st.markdown(f"**{vname}**")
+
+                                if vname in content_by_topic[content.topic_id]:
+                                    c = content_by_topic[content.topic_id][vname]
+                                    st.caption(f"{c.word_count} words | {c.estimated_read_time} min")
+                                    if hasattr(c, '_generation_time'):
+                                        st.caption(f"⏱️ {c._generation_time:.1f}s")
+
+                                    st.markdown(f"**{c.title}**")
+                                    st.text_area(
+                                        f"{vname} content",
+                                        c.body,
+                                        height=500,
+                                        key=f"side-{c.content_id}",
+                                        label_visibility="collapsed"
+                                    )
+                                else:
+                                    st.info("Generating...")
+
+                        st.markdown("---")
 
                 elif stage_type == "complete":
                     final_result = data
