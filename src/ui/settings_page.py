@@ -49,34 +49,6 @@ def show():
                 value=settings.notification_email if settings else ""
             )
 
-            st.markdown("---")
-            st.markdown("### Default Brand Profile")
-
-            # Get all profiles for selection
-            profiles = storage.get_profiles()
-
-            if profiles:
-                profile_options = {p.profile_name: p.profile_id for p in profiles}
-                profile_names = list(profile_options.keys())
-
-                # Find current default
-                current_default_id = settings.active_profile_id if settings and settings.active_profile_id else None
-                current_default_name = None
-                if current_default_id:
-                    current_default_name = next((p.profile_name for p in profiles if p.profile_id == current_default_id), None)
-
-                default_index = profile_names.index(current_default_name) if current_default_name in profile_names else 0
-
-                default_profile_name = st.selectbox(
-                    "Default Profile for Pipeline",
-                    options=profile_names,
-                    index=default_index,
-                    help="This profile will be pre-selected when running the pipeline"
-                )
-            else:
-                st.info("Create a brand profile in the Brand Profiles tab to set as default")
-                default_profile_name = None
-
             if st.form_submit_button("Save User Profile", type="primary"):
                 if not full_name:
                     st.error("Full name is required")
@@ -87,20 +59,16 @@ def show():
                         # Twitter removed
                         if notification_email:
                             settings.notification_email = notification_email
-                        # Set default profile
-                        if default_profile_name and default_profile_name in profile_options:
-                            settings.active_profile_id = profile_options[default_profile_name]
                     else:
                         settings = UserSettings(
                             user_full_name=full_name,
                             linkedin_username=linkedin_username or None,
                             twitter_username=None,
-                            notification_email=notification_email or None,
-                            active_profile_id=profile_options[default_profile_name] if default_profile_name and default_profile_name in profile_options else None
+                            notification_email=notification_email or None
                         )
 
                     storage.save_settings(settings)
-                    st.success(f"User profile saved. Default profile: {default_profile_name if default_profile_name else 'None'}")
+                    st.success("User profile saved")
                     st.rerun()
 
     # === TAB 2: Brand Profiles ===
@@ -116,13 +84,43 @@ def show():
         profiles = storage.get_profiles(active_only=False)
 
         if profiles:
-            st.markdown("### Your Profiles")
+            st.markdown("### Default Profile Selection")
 
             # Get default profile ID
             settings = storage.get_settings()
             default_profile_id = settings.active_profile_id if settings else None
 
-            for profile in profiles:
+            # Default profile selector
+            profile_options = {p.profile_name: p.profile_id for p in profiles}
+            profile_names = list(profile_options.keys())
+
+            current_default_name = None
+            if default_profile_id:
+                current_default_name = next((p.profile_name for p in profiles if p.profile_id == default_profile_id), None)
+
+            default_index = profile_names.index(current_default_name) if current_default_name in profile_names else 0
+
+            selected_default = st.selectbox(
+                "Set Default Profile for Pipeline",
+                options=profile_names,
+                index=default_index,
+                help="This profile will be pre-selected when running the pipeline"
+            )
+
+            if st.button("Save Default Profile", type="primary"):
+                if settings:
+                    settings.active_profile_id = profile_options[selected_default]
+                    storage.save_settings(settings)
+                    st.success(f"Default profile set to: {selected_default}")
+                    st.rerun()
+
+            st.markdown("---")
+            st.markdown("### Your Profiles")
+
+            # Sort profiles to show default first
+            sorted_profiles = sorted(profiles, key=lambda p: (p.profile_id != default_profile_id, p.profile_name))
+
+            for profile in sorted_profiles:
                 is_default = profile.profile_id == default_profile_id
                 default_badge = " [DEFAULT]" if is_default else ""
 
@@ -364,19 +362,44 @@ def show():
 
         st.markdown("### Current Categories")
 
-        # Display current categories with delete buttons
+        # Display current categories with edit and delete buttons
         categories = settings.idea_categories
 
-        for category in categories:
-            col1, col2 = st.columns([4, 1])
+        for idx, category in enumerate(categories):
+            col1, col2, col3 = st.columns([4, 1, 1])
             with col1:
                 st.text(f"• {category}")
             with col2:
-                if st.button("🗑️", key=f"del-cat-{category}"):
+                if st.button("Edit", key=f"edit-cat-{idx}"):
+                    st.session_state[f"editing_cat_{idx}"] = True
+                    st.rerun()
+            with col3:
+                if st.button("Delete", key=f"del-cat-{idx}"):
                     settings.idea_categories.remove(category)
                     storage.save_settings(settings)
                     st.success(f"Deleted category: {category}")
                     st.rerun()
+
+            # Show edit form if editing
+            if st.session_state.get(f"editing_cat_{idx}", False):
+                with st.form(f"edit_cat_form_{idx}"):
+                    new_name = st.text_input("New name", value=category)
+
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        if st.form_submit_button("Save"):
+                            if new_name and new_name not in settings.idea_categories:
+                                settings.idea_categories[idx] = new_name
+                                storage.save_settings(settings)
+                                del st.session_state[f"editing_cat_{idx}"]
+                                st.success(f"Updated category to: {new_name}")
+                                st.rerun()
+                            elif new_name in settings.idea_categories:
+                                st.error("Category name already exists")
+                    with col_b:
+                        if st.form_submit_button("Cancel"):
+                            del st.session_state[f"editing_cat_{idx}"]
+                            st.rerun()
 
         st.markdown("---")
 
@@ -492,46 +515,50 @@ def show():
         st.info("The pipeline always generates 3 versions of content. Customize what each version represents for your content strategy.")
 
         with st.form("pipeline_stages"):
-            st.markdown("### Stage 1")
-            stage1_name = st.text_input(
-                "Stage 1 Name",
-                value=settings.content_version_names[0] if len(settings.content_version_names) > 0 else "Bridge",
-                help="Name for the first content version"
-            )
-            stage1_desc = st.text_area(
-                "Stage 1 Description",
-                value=settings.content_version_descriptions[0] if len(settings.content_version_descriptions) > 0 else "",
-                height=80,
-                help="Describe the purpose and style of this version"
-            )
+            # 3-column layout matching pipeline runner display
+            col1, col2, col3 = st.columns(3)
 
-            st.markdown("---")
-            st.markdown("### Stage 2")
-            stage2_name = st.text_input(
-                "Stage 2 Name",
-                value=settings.content_version_names[1] if len(settings.content_version_names) > 1 else "Aspirational",
-                help="Name for the second content version"
-            )
-            stage2_desc = st.text_area(
-                "Stage 2 Description",
-                value=settings.content_version_descriptions[1] if len(settings.content_version_descriptions) > 1 else "",
-                height=80,
-                help="Describe the purpose and style of this version"
-            )
+            with col1:
+                st.markdown("### Stage 1")
+                stage1_name = st.text_input(
+                    "Name",
+                    value=settings.content_version_names[0] if len(settings.content_version_names) > 0 else "Bridge",
+                    key="ps_s1_name"
+                )
+                stage1_desc = st.text_area(
+                    "Description",
+                    value=settings.content_version_descriptions[0] if len(settings.content_version_descriptions) > 0 else "",
+                    height=150,
+                    key="ps_s1_desc"
+                )
 
-            st.markdown("---")
-            st.markdown("### Stage 3")
-            stage3_name = st.text_input(
-                "Stage 3 Name",
-                value=settings.content_version_names[2] if len(settings.content_version_names) > 2 else "Current",
-                help="Name for the third content version"
-            )
-            stage3_desc = st.text_area(
-                "Stage 3 Description",
-                value=settings.content_version_descriptions[2] if len(settings.content_version_descriptions) > 2 else "",
-                height=80,
-                help="Describe the purpose and style of this version"
-            )
+            with col2:
+                st.markdown("### Stage 2")
+                stage2_name = st.text_input(
+                    "Name",
+                    value=settings.content_version_names[1] if len(settings.content_version_names) > 1 else "Aspirational",
+                    key="ps_s2_name"
+                )
+                stage2_desc = st.text_area(
+                    "Description",
+                    value=settings.content_version_descriptions[1] if len(settings.content_version_descriptions) > 1 else "",
+                    height=150,
+                    key="ps_s2_desc"
+                )
+
+            with col3:
+                st.markdown("### Stage 3")
+                stage3_name = st.text_input(
+                    "Name",
+                    value=settings.content_version_names[2] if len(settings.content_version_names) > 2 else "Current",
+                    key="ps_s3_name"
+                )
+                stage3_desc = st.text_area(
+                    "Description",
+                    value=settings.content_version_descriptions[2] if len(settings.content_version_descriptions) > 2 else "",
+                    height=150,
+                    key="ps_s3_desc"
+                )
 
             st.markdown("---")
 

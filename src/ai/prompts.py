@@ -1,6 +1,5 @@
 """Prompt template management and rendering."""
 
-from pathlib import Path
 from typing import Dict, Any
 from config.settings import PROMPTS_DIR
 

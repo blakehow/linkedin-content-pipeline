@@ -74,7 +74,7 @@ class GeminiClient(AIClient):
 
         try:
             # Try a simple generation to test
-            response = self._model.generate_content("Test")
+            _ = self._model.generate_content("Test")
             self._available = True
             return True
         except Exception as e:

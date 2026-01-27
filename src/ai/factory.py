@@ -81,7 +81,8 @@ class AIClientWithFallback:
             elif not self.fallback_client:
                 error_parts.append("No fallback service configured")
 
-            full_error = ". ".join(error_parts)
+            details = ". ".join(error_parts)
+            full_error = f"All AI services failed. {details}"
             self._last_error_message = full_error
             raise RuntimeError(full_error)
 

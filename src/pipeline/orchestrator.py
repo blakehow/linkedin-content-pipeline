@@ -311,7 +311,6 @@ class PipelineOrchestrator:
         pipeline_start = time.time()
         stage1_start = None
         stage2_start = None
-        stage3_start = None
         stage1_duration = 0
         stage2_duration = 0
         stage3_duration = 0

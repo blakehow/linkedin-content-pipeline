@@ -8,10 +8,11 @@ logger = logging.getLogger(__name__)
 
 # Dangerous patterns that might indicate prompt injection attempts
 INJECTION_PATTERNS = [
-    r"ignore\s+previous\s+instructions",
-    r"ignore\s+all\s+previous",
-    r"disregard\s+previous",
-    r"forget\s+previous",
+    r"ignore.{0,20}previous.{0,20}(instructions|commands)",
+    r"disregard.{0,20}previous.{0,20}(instructions|commands)",
+    r"forget.{0,20}previous.{0,20}(instructions|commands)",
+    r"forget.{0,20}all.{0,20}(previous|commands)",
+    r"forget.{0,20}(everything|all).{0,20}before",
     r"new\s+instructions:",
     r"system\s+prompt:",
     r"</?\s*system\s*>",
