@@ -56,14 +56,14 @@ def show():
             profiles = storage.get_profiles()
 
             if profiles:
-                profile_options = {p.name: p.profile_id for p in profiles}
+                profile_options = {p.profile_name: p.profile_id for p in profiles}
                 profile_names = list(profile_options.keys())
 
                 # Find current default
                 current_default_id = settings.active_profile_id if settings and settings.active_profile_id else None
                 current_default_name = None
                 if current_default_id:
-                    current_default_name = next((p.name for p in profiles if p.profile_id == current_default_id), None)
+                    current_default_name = next((p.profile_name for p in profiles if p.profile_id == current_default_id), None)
 
                 default_index = profile_names.index(current_default_name) if current_default_name in profile_names else 0
 
