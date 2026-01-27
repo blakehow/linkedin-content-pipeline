@@ -49,6 +49,34 @@ def show():
                 value=settings.notification_email if settings else ""
             )
 
+            st.markdown("---")
+            st.markdown("### Default Brand Profile")
+
+            # Get all profiles for selection
+            profiles = storage.get_profiles()
+
+            if profiles:
+                profile_options = {p.name: p.profile_id for p in profiles}
+                profile_names = list(profile_options.keys())
+
+                # Find current default
+                current_default_id = settings.active_profile_id if settings and settings.active_profile_id else None
+                current_default_name = None
+                if current_default_id:
+                    current_default_name = next((p.name for p in profiles if p.profile_id == current_default_id), None)
+
+                default_index = profile_names.index(current_default_name) if current_default_name in profile_names else 0
+
+                default_profile_name = st.selectbox(
+                    "Default Profile for Pipeline",
+                    options=profile_names,
+                    index=default_index,
+                    help="This profile will be pre-selected when running the pipeline"
+                )
+            else:
+                st.info("Create a brand profile in the Brand Profiles tab to set as default")
+                default_profile_name = None
+
             if st.form_submit_button("Save User Profile", type="primary"):
                 if not full_name:
                     st.error("Full name is required")
@@ -59,16 +87,20 @@ def show():
                         # Twitter removed
                         if notification_email:
                             settings.notification_email = notification_email
+                        # Set default profile
+                        if default_profile_name and default_profile_name in profile_options:
+                            settings.active_profile_id = profile_options[default_profile_name]
                     else:
                         settings = UserSettings(
                             user_full_name=full_name,
                             linkedin_username=linkedin_username or None,
                             twitter_username=None,
-                            notification_email=notification_email or None
+                            notification_email=notification_email or None,
+                            active_profile_id=profile_options[default_profile_name] if default_profile_name and default_profile_name in profile_options else None
                         )
 
                     storage.save_settings(settings)
-                    st.success("User profile saved")
+                    st.success(f"User profile saved. Default profile: {default_profile_name if default_profile_name else 'None'}")
                     st.rerun()
 
     # === TAB 2: Brand Profiles ===
@@ -86,9 +118,16 @@ def show():
         if profiles:
             st.markdown("### Your Profiles")
 
+            # Get default profile ID
+            settings = storage.get_settings()
+            default_profile_id = settings.active_profile_id if settings else None
+
             for profile in profiles:
+                is_default = profile.profile_id == default_profile_id
+                default_badge = " [DEFAULT]" if is_default else ""
+
                 with st.expander(
-                    f"{'✅ ' if profile.is_active else '❌ '}{profile.profile_name} ({profile.profile_type.value})"
+                    f"{'✅ ' if profile.is_active else '❌ '}{profile.profile_name}{default_badge} ({profile.profile_type.value})"
                 ):
                     st.write(f"**Target Audience:** {profile.target_audience}")
                     st.write(f"**Tone:** {profile.tone}")
