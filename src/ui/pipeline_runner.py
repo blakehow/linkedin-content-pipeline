@@ -431,7 +431,7 @@ def show():
                                         f"{vname} content",
                                         c.body,
                                         height=500,
-                                        key=f"side-{topic.topic_id}-{vname}",
+                                        key=f"side-topic{topic_idx}-col{idx}-{vname}",
                                         label_visibility="collapsed"
                                     )
                                 else:
