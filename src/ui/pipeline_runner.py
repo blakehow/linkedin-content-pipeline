@@ -393,11 +393,15 @@ def show():
                         content_by_topic[content.topic_id] = {}
                     content_by_topic[content.topic_id][version_name] = content
 
-                    # Re-render all content for this topic in side-by-side columns
-                    topic_idx = next((i for i, t in enumerate(topic_briefs) if t.topic_id == content.topic_id), 0)
-                    topic = topic_briefs[topic_idx]
+                    # Don't re-render entire area - we'll show final results at the end
 
-                    with content_display_area:
+                elif stage_type == "complete":
+                    final_result = data
+
+            # Now display all content side-by-side after pipeline completes
+            if content_by_topic:
+                with content_display_area:
+                    for topic_idx, topic in enumerate(topic_briefs):
                         st.markdown(f"### Topic {topic_idx + 1}: {topic.core_insight[:80]}...")
 
                         # Create 3 columns for side-by-side comparison
@@ -416,8 +420,8 @@ def show():
                             with col:
                                 st.markdown(f"**{vname}**")
 
-                                if vname in content_by_topic[content.topic_id]:
-                                    c = content_by_topic[content.topic_id][vname]
+                                if topic.topic_id in content_by_topic and vname in content_by_topic[topic.topic_id]:
+                                    c = content_by_topic[topic.topic_id][vname]
                                     st.caption(f"{c.word_count} words | {c.estimated_read_time} min")
                                     if hasattr(c, '_generation_time'):
                                         st.caption(f"⏱️ {c._generation_time:.1f}s")
@@ -427,16 +431,13 @@ def show():
                                         f"{vname} content",
                                         c.body,
                                         height=500,
-                                        key=f"side-{c.content_id}",
+                                        key=f"side-{topic.topic_id}-{vname}",
                                         label_visibility="collapsed"
                                     )
                                 else:
-                                    st.info("Generating...")
+                                    st.info("Content not generated")
 
                         st.markdown("---")
-
-                elif stage_type == "complete":
-                    final_result = data
 
             elapsed_time = time.time() - start_time
 
