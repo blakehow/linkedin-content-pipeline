@@ -215,6 +215,10 @@ class MockStorage:
 
         return content
 
+    def get_all_content(self) -> List[GeneratedContent]:
+        """Get all generated content (alias for get_content_list with no limit)."""
+        return self.get_content_list(limit=None)
+
     def get_content(self, generation_id: str) -> Optional[GeneratedContent]:
         """Get specific generated content by ID."""
         content_list = self.get_content_list()
