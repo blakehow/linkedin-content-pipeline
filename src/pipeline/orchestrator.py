@@ -409,7 +409,7 @@ class PipelineOrchestrator:
 
                 # Stage 2: Develop this specific version
                 s2_start = time.time()
-                logger.info(f"--- Developing {version} for topic: {topic.title} ---")
+                logger.info(f"--- Developing {version} for topic: {topic.core_insight[:60]} ---")
                 contents = self.stage2.develop_content(
                     topic_brief=topic,
                     profile=profile,
